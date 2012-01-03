@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>拡散希望</title>
+<link href="static/css/bootstrap.css" rel="stylesheet">
+<script src="http://static.mixi.jp/js/page.js"></script>
+<script>
+    mixi.init({
+        appId: '<TMPL_VAR NAME='appId'>'
+    });
+    mixi.window.adjustHeight(height);
+</script>
+</head>
+<body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=<TMPL_VAR NAME='facebook_appId'>";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<h2>ボイスでこのページを友人に教える</h2>
+<div>
+<TMPL_IF name='user_id'>
+<p><TMPL_VAR NAME='displayName' ESCAPE='HTML'>さんとして書き込みます。
+(<a href="/logout?mixi_page_id=<TMPL_VAR NAME='page_id'>&sig=<TMPL_VAR NAME='sig'>">別のユーザーで書き込む場合はこちら</a>)
+</p>
+<div>
+    <form method="POST" action="/voice">
+        <input type="hidden" name="mixi_page_id" value="<TMPL_VAR NAME='page_id'>">
+        <input type="hidden" name="sig" value="<TMPL_VAR NAME='raw_sig'>">
+        <textarea class="xlarge" name="voicemsg" id="voicemsg" rows="2">mixiページ紹介 : <TMPL_VAR NAME='page_displayName' ESCAPE='HTML'> <TMPL_VAR NAME='page_url'></textarea>
+        <br>
+        <br>
+        <input type="submit" class="btn primary" value="ボイスに書き込む">
+        <a href="/logout?mixi_page_id=<TMPL_VAR NAME='page_id'>&sig=<TMPL_VAR NAME='sig'>">権限を取り消す</a>
+    </form>
+</div>
+<TMPL_ELSE>
+<p>
+ここからボイスに書き込むことができます。
+ボイスに書き込むためには、このmixiページアプリに権限を与える必要があります。
+</p>
+<button class="btn large primary" id="auth">ボイスに書き込む権限を与える</button>
+</TMPL_IF>
+</div>
+<br>
+
+<h2>Facebook, Twitterで広める</h2>
+<div>
+<p>
+このページをFacebookやTwitterで広めましょう。
+</p>
+
+<div>
+    <div class="fb-like" data-href="<TMPL_VAR NAME='page_url'>" data-send="true" data-width="300" data-show-faces="true" data-font="arial"></div>
+</div>
+<div>
+    <a href="https://twitter.com/share" class="twitter-share-button" data-url="<TMPL_VAR NAME='page_url'>" data-text="mixiページ紹介 : <TMPL_VAR NAME='page_displayName' ESCAPE='HTML'>" data-lang="ja" data-size="large">ツイート</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+</div>
+
+</body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript">
+<!--
+        $(document).ready(function(){
+            $("button#auth").click(function(){
+                mixi.auth({
+                    scope: "r_profile w_voice",
+                    state: "<TMPL_VAR NAME='raw_sig'>"
+                });
+            } );
+        });
+//-->
+</script>
+</html>

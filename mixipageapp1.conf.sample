@@ -1,0 +1,14 @@
+# rename this file to mixipageapp1.yml and put a ':' after 'name' if
+# you want to use YAML like in old versions of Catalyst
+name MixiPageApp1
+
+# mixi page app client_id/secret/redirect_uri
+client_id your_client_id_string
+client_secret your client_secret_string 
+redirect_uri http://example.com/authorization/callback/
+
+# HMAC Key to generate original signature 
+signature_key your_generated_random_string
+
+# appid to use at facebook gadjet
+facebook_appId your_facebook_appid
