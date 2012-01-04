@@ -120,11 +120,15 @@ sub default : Private {
 
     # Validate normal OAuth signeture
     my $isValidReq = MixiPageApp1::OAuthUtil::SignedRequest::validate($c->req) ;
-
     if ( $isValidOriginalRequest or $isValidReq ){
 
         if ( $isValidReq ) {
             MixiPageApp1::Session::set_page_id($c->session, $c->req);
+
+            # if user has changd, clear user data
+            if (!MixiPageApp1::Session::validate_user_id($c->session, $c->req)) {
+                MixiPageApp1::Session::clear_user($c->session);
+            }
         }
         MixiPageApp1::Session::update_session($c->session);
         $param_sig = MixiPageApp1::Session::calcuate_signature($c->session, $c->config);
@@ -134,6 +138,18 @@ sub default : Private {
                             $access_token_client->access_token, 
                             $param_page_id
                         );
+
+        # check and refresh access_token(user)
+        if (MixiPageApp1::Session::get_access_token($c->session) and 
+            (MixiPageApp1::Session::get_expires_in($c->session) < time)
+        ) {
+            my $new_access_token = MixiPageApp1::OAuthUtil::AccessToken::get_from_refreshtoken(
+                                       $c->config,
+                                       MixiPageApp1::Session::get_refresh_token($c->session));
+            if (defined($new_access_token)) {
+                MixiPageApp1::Session::set_access_token($c->session, $new_access_token);
+            }
+        }
 
         # Set variables and template
         $c->stash->{appId} = $c->config->{client_id};

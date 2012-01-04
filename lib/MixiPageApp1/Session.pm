@@ -43,6 +43,16 @@ sub get_page_id{
     return $session->{page_id} || '';
 }
 
+sub get_expires_in{
+    my $session = shift;
+    return $session->{expires_in} || 0;
+}
+
+sub get_refresh_token{
+    my $session = shift;
+    return $session->{refresh_token} || '';
+}
+
 sub set_user_info{
     my ( $session, $user_info ) = @_;
     $session->{user_id} = $user_info->{entry}->{id} || '';
@@ -52,8 +62,10 @@ sub set_user_info{
 sub set_access_token{
     my ( $session, $access_token ) = @_;
     $session->{access_token} = $access_token->access_token;
-    $session->{refresh_token} = $access_token->refresh_token;
     $session->{expires_in} = $access_token->expires_in;
+    if (defined($access_token->refresh_token)) {
+        $session->{refresh_token} = $access_token->refresh_token;
+    }
 }
 
 sub set_page_id{
@@ -78,12 +90,23 @@ sub calcuate_signature{
            );
 }
 
-# validate signature(not OAuth signed request)
+# validate page_id
 sub validate_page_id{
     my ( $session, $req ) = @_;
     my $param_page_id = uri_unescape($req->param('mixi_page_id') || '');
     my $session_page_id = $session->{page_id} || '';
-    if ( !$param_page_id or ( $param_page_id ne $session_page_id ) ){
+    if ( !$param_page_id or ( $param_page_id ne $session_page_id )   ){
+        return 0;
+    }
+    return 1;
+}
+
+# validate user_id
+sub validate_user_id{
+    my ( $session, $req ) = @_;
+    my $param_viewer_id = uri_unescape($req->param('mixi_viewer_id') || '');
+    my $session_user_id = $session->{user_id} || '';
+    if ( !$param_viewer_id or ( $param_viewer_id ne $session_user_id ) ){
         return 0;
     }
     return 1;
