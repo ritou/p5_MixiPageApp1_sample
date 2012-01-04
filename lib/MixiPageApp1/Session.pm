@@ -62,7 +62,7 @@ sub set_user_info{
 sub set_access_token{
     my ( $session, $access_token ) = @_;
     $session->{access_token} = $access_token->access_token;
-    $session->{expires_in} = $access_token->expires_in;
+    $session->{expires_in} = int($access_token->expires_in) + time;
     if (defined($access_token->refresh_token)) {
         $session->{refresh_token} = $access_token->refresh_token;
     }
